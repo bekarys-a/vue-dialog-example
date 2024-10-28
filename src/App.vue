@@ -8,36 +8,51 @@
       flex-direction: column;
     "
   >
-    <el-button
-      type="primary"
-      @click="edit"
-    >
-      пройти опрос
-    </el-button>
-    <h1>{{ result }}</h1>
+    <h1>{{ text }}</h1>
+    <div>
+      <el-button
+        type="primary"
+        @click="editGood"
+      >
+        промис
+      </el-button>
+      <el-button
+        type="primary"
+        @click="badVisible = true"
+      >
+        стандартный
+      </el-button>
+    </div>
   </div>
-  <EditDialog ref="EditDialogRef" />
+  <GoodDialog ref="GoodDialogRef" />
+  <BadDialog
+    v-model="badVisible"
+    :text="text"
+    @change="(value) => (text = value)"
+  />
 </template>
 
 <script setup lang="ts">
-import EditDialog from '@/components/EditDialog.vue'
+import GoodDialog from '@/components/GoodDialog.vue'
+import BadDialog from '@/components/BadDialog.vue'
 import { ElMessage, ElButton } from 'element-plus'
 import { ref, useTemplateRef } from 'vue'
 
-type EditDialogType = InstanceType<typeof EditDialog>
-const EditDialogRef = useTemplateRef<EditDialogType>('EditDialogRef')
+const text = ref<string>('hello')
 
-const result = ref<string>()
+const badVisible = ref(false)
 
-async function edit() {
+type GoodDialogType = InstanceType<typeof GoodDialog>
+const GoodDialogRef = useTemplateRef<GoodDialogType>('GoodDialogRef')
+
+async function editGood() {
   try {
-    result.value = await EditDialogRef.value!.open()
+    text.value = await GoodDialogRef.value!.open(text.value)
     ElMessage({
       message: 'успешно изменено',
       type: 'success',
     })
   } catch {
-    result.value = undefined
     ElMessage({
       message: 'не сохранено',
       type: 'error',

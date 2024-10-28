@@ -21,37 +21,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch} from 'vue'
 import { ElRow, ElButton, ElDialog } from 'element-plus'
 
-defineExpose({
-  open,
-})
+const model = ref<string>()
+const dialogVisible = defineModel()
+const props = defineProps<{
+  text: string
+}>()
 
-const dialogVisible = ref(false)
+watch(
+  () => props.text,
+  (value) => (model.value = value),
+  {
+    immediate: true,
+  }
+)
 
-type ResolveType = string
-const model = ref<ResolveType>('')
-
-let resolve: (value: ResolveType) => void
-let reject: (value?: unknown) => void
-
-function open() {
-  dialogVisible.value = true
-
-  return new Promise<ResolveType>((ok, fail) => {
-    resolve = ok
-    reject = fail
-  })
-}
+const emit = defineEmits<{
+  change: [text: string]
+}>()
 
 function accept() {
+  emit('change', model.value)
   dialogVisible.value = false
-  resolve(model.value)
 }
 
 function close() {
   dialogVisible.value = false
-  reject()
 }
 </script>
